@@ -10,22 +10,22 @@ void CAN_Config(void)
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE); // 使能GPIOB和AFIO时
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE); // 使能GPIOA和AFIO时钟
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
 
-    // 使能重映射，将CAN1映射到PB8/PB9
-    GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE);
+    // 关闭重映射，使用默认引脚PA11/PA12
+    // GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE); // 注释掉重映射
 
-    // CAN RX (PB8) 输入上拉
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+    // CAN RX (PA11) 输入上拉
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    // CAN TX (PB9) 复用推挽输出
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+    // CAN TX (PA12) 复用推挽输出
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     // CAN 单元初始化
     CAN_DeInit(CAN1);
