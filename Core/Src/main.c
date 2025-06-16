@@ -10,22 +10,22 @@ void CAN_Config(void)
     CAN_FilterInitTypeDef CAN_FilterInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE); // 使能GPIOA和AFIO时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE); // 使能GPIOB和AFIO时钟
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
 
-    // 关闭重映射，使用默认引脚PA11/PA12
-    // GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE); // 注释掉重映射
+    // 使能CAN1重映射到PB8/PB9
+    GPIO_PinRemapConfig(GPIO_Remap1_CAN1, ENABLE);
 
-    // CAN RX (PA11) 输入上拉
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+    // CAN RX (PB8) 输入上拉
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    // CAN TX (PA12) 复用推挽输出
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+    // CAN TX (PB9) 复用推挽输出
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
 
     // CAN 单元初始化
     CAN_DeInit(CAN1);
@@ -40,7 +40,7 @@ void CAN_Config(void)
     CAN_InitStructure.CAN_SJW = CAN_SJW_1tq;
     CAN_InitStructure.CAN_BS1 = CAN_BS1_8tq;
     CAN_InitStructure.CAN_BS2 = CAN_BS2_3tq;
-    CAN_InitStructure.CAN_Prescaler = 12; // 500kbps@36MHz
+    CAN_InitStructure.CAN_Prescaler = 6; // 500kbps@36MHz
     CAN_Init(CAN1, &CAN_InitStructure);
 
     // 过滤器配置，接收所有
@@ -70,14 +70,14 @@ void CAN_SendMessage(uint32_t id, uint8_t *data, uint8_t length)
 {
     CanTxMsg TxMessage;
     TxMessage.StdId = id;
-    TxMessage.ExtId = 0x00;
-    TxMessage.IDE = CAN_Id_Standard;
+    TxMessage.ExtId = 0x18FFFF02; // 对于标准ID，扩展ID不使用
+    TxMessage.IDE = CAN_ID_EXT;//CAN_ID_STD  CAN_ID_EXT
     TxMessage.RTR = CAN_RTR_Data;
     TxMessage.DLC = length;
     for (uint8_t i = 0; i < length; i++)
         TxMessage.Data[i] = data[i];
 
-    SEGGER_RTT_printf(0, "Send: %02X\r\n", TxMessage.StdId);
+    SEGGER_RTT_printf(0, "Send: StdId:%02X,ExtId:%02X\r\n", TxMessage.StdId,TxMessage.ExtId);
     // CAN_Transmit(CAN1, &TxMessage);
     uint8_t mailbox;
     mailbox = CAN_Transmit(CAN1, &TxMessage);
@@ -94,7 +94,9 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
         CAN_Receive(CAN1, CAN_FIFO0, &RxMessage);
         // 这里可以处理接收到的数据，比如打印
         // 例如：SEGGER_RTT_printf(0, "CAN RX: %02X %02X ...\r\n", RxMessage.Data[0], ...);
-        SEGGER_RTT_printf(0, "Receive: %02X\r\n", RxMessage.StdId);
+        SEGGER_RTT_printf(0, "StdId: %02X,ExtId:%02X\r\n", RxMessage.StdId,RxMessage.ExtId);
+        SEGGER_RTT_printf(0, "Receive Data: %02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X\r\n", RxMessage.Data[0],RxMessage.Data[1], RxMessage.Data[2], RxMessage.Data[3],
+                          RxMessage.Data[4], RxMessage.Data[5], RxMessage.Data[6], RxMessage.Data[7]);
         CAN_ClearITPendingBit(CAN1, CAN_IT_FMP0);
     }
 }
@@ -110,6 +112,6 @@ int main(void)
     while (1)
     {
         CAN_SendMessage(0x456, data, 8);
-        delay_1ms(1000);
+        delay_1ms(500); // 发送间隔500ms
     }
 }
