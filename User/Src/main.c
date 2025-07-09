@@ -10,7 +10,7 @@
  * microcontroller manufactured by Nanjing Qinheng Microelectronics.
  *******************************************************************************/
 #include "stm32f10x.h"
-
+#include "main.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -97,6 +97,9 @@ void task2_task(void *pvParameters)
  */
 int main(void)
 {
+	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SEGGER_RTT_WriteString(0, "SEGGER Real-Time-Terminal Sample\r\n\r\n");
+
     SystemCoreClockUpdate();
     // USART_Printf_Init( 115200 );
     // printf( "SystemClk:%d\r\n", SystemCoreClock );

@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\User\Inc;.\Third_Party\FreeRTOS\Source\include;.\Third_Party\FreeRTOS\Source\CMSIS_RTOS;.\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM3</IncludePath>
+              <IncludePath>.\User\Inc;.\Third_Party\FreeRTOS\Source\include;.\Third_Party\FreeRTOS\Source\CMSIS_RTOS;.\Third_Party\FreeRTOS\Source\portable\RVDS\ARM_CM3;.\Third_Party\RTT</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -452,6 +452,21 @@
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Third_Party/RTT</GroupName>
+          <Files>
+            <File>
+              <FileName>SEGGER_RTT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Third_Party\RTT\SEGGER_RTT.c</FilePath>
+            </File>
+            <File>
+              <FileName>SEGGER_RTT_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Third_Party\RTT\SEGGER_RTT_printf.c</FilePath>
             </File>
           </Files>
         </Group>
