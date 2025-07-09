@@ -1,0 +1,6 @@
+.vscode/
+DebugConfig
+Listings/
+Objects/
+RTE/Device/
+JLink*
